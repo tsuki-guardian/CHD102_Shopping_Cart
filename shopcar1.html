@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>購物車</title>
+    <style>
+      body {
+        background-color: rgb(209, 221, 233);
+      }
+      .container {
+        max-width: 1280px;
+        width: 100%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .productPick {
+        text-align: center;
+      }
+
+      .container h2 {
+        text-align: center;
+        font-size: 24px;
+      }
+
+      .pic {
+        width: 200px;
+        height: 150px;
+      }
+
+      .pic img {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+      }
+
+      ul {
+        margin: auto;
+      }
+
+      li {
+        margin: auto;
+        border: 0.5px solid rgb(137, 158, 158);
+        border-radius: 16px;
+        list-style-type: none;
+        width: 700px;
+        background-color: rgb(199, 225, 225);
+        margin-bottom: 20px;
+      }
+
+      .card {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin: 10px;
+      }
+
+      button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50px;
+        border: 0.5px solid rgb(137, 158, 158);
+        font-size: 20px;
+        font-weight: 400;
+        color: #333;
+      }
+
+      .text {
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-grow: 1;
+      }
+
+      .del {
+        font-size: 14px;
+      }
+
+      .total {
+        font-size: 24px;
+        white-space: nowrap;
+        margin: 10px;
+        border-bottom: 1px solid rgb(137, 158, 158);
+        text-align: center;
+        align-self: flex-end;
+      }
+
+      .reset {
+        align-self: flex-end;
+        font-size: 12px;
+      }
+
+      /* 過渡動畫 */
+      .list-move {
+        transition: transform 1s;
+      }
+      .list-enter-active,
+      .list-leave-active {
+        transition: all 1s;
+      }
+      .list-enter,
+      .list-leave-to {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="container">
+        <h2>購物車</h2>
+        <p class="productPick">購物車目前有{{productAmount}}件商品</p>
+        <p class="productPick" v-show="empty">購物車空空的</p>
+        <button class="reset" @click="reset">重置</button>
+        <transition-group name="list" tag="ul">
+          <li v-for="(item,index) in shoplist" :key="item.name">
+            <div class="card">
+              <div class="pic">
+                <img :src="item.img" />
+              </div>
+              <div class="text">
+                <h4>{{item.name}}</h4>
+                <p>${{item.price}}</p>
+              </div>
+              <button v-on:click="add(index)">+</button>
+              <div class="quantity">{{item.quantity}}</div>
+              <button v-on:click="minus(index)">-</button>
+              <button @click="remove(index)" class="remove">X</button>
+            </div>
+          </li>
+        </transition-group>
+
+        <div class="total">
+          您選了{{productAmount}}件商品，總數{{totalAmount}}件，總共{{totalPrice}}元
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      Vue.createApp({
+        data() {
+          return {
+            empty: false,
+            shoplist: [
+              {
+                name: "Apple",
+                price: 200,
+                img: "https://picsum.photos/300/200/?random=10",
+                quantity: 0,
+              },
+              {
+                name: "Orange",
+                price: 300,
+                img: "https://picsum.photos/300/200/?random=15",
+                quantity: 0,
+              },
+              {
+                name: "Banana",
+                price: 400,
+                img: "https://picsum.photos/300/200/?random=12",
+                quantity: 0,
+              },
+            ],
+          };
+        },
+        computed: {
+          productAmount() {
+            const shopLength = this.shoplist.length;
+            this.empty = shopLength === 0;
+            return shopLength;
+          },
+          totalPrice() {
+            return this.shoplist.reduce(
+              (total, item) => total + item.price * item.quantity,
+              0
+            );
+          },
+          totalAmount() {
+            return this.shoplist.reduce(
+              (total, item) => total + item.quantity,
+              0
+            );
+          },
+        },
+        methods: {
+          remove(index) {
+            this.shoplist.splice(index, 1);
+          },
+          add(index) {
+            this.shoplist[index].quantity += 1;
+          },
+          minus(index) {
+            if (this.shoplist[index].quantity != 0) {
+              this.shoplist[index].quantity -= 1;
+            }
+          },
+          reset() {
+            for (let i = 0; i < this.shoplist.length; i++) {
+              this.shoplist[i].quantity = 0;
+            }
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
